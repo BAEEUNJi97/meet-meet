@@ -8,80 +8,28 @@ on:
   push:
     branches:
       - staging
-  workflow_dispatch:
 
 jobs:
   push-to-fork:
     runs-on: ubuntu-latest
+    container: pandoc/latex
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Push to fork repository
+      - uses: actions/checkout@v4
+      - name: Install mustache (to update the date)
+        run: apk add ruby && gem install mustache
+      - name: creates output
+        run: sh ./build.sh
+      - name: Pushes to another repository
+        id: push_directory
         uses: cpina/github-action-push-to-another-repository@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.AUTO_ACTIONS }}
         with:
-          source-directory: '.' # 전체 리포지토리를 푸시
+          source-directory: 'output'
           destination-github-username: 'window-ook'
           destination-repository-name: 'meet2-web'
           user-email: ${{ secrets.EMAIL }}
-          commit-message: ${{ github.event.commits[0].message || 'Update from team repository' }}
+          commit-message: ${{ github.event.commits[0].message }}
           target-branch: staging
-
-  deploy-to-vercel:
-    # 포크 리포지토리로 푸시가 완료된 후 실행
-    needs: push-to-fork
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 포크 리포지토리 체크아웃
-        uses: actions/checkout@v4
-        with:
-          repository: window-ook/meet2-web
-          ref: staging
-          token: ${{ secrets.AUTO_ACTIONS }} # 포크 리포지토리 접근 권한
-
-      - name: Node.js 셋업
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10.11
-          run_install: false
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: 의존성(라이브러리) 설치
-        run: pnpm install
-
-      - name: Run Tests
-        run: pnpm run test || true # 테스트가 실패해도 계속 진행
-
-      - name: Vercel CLI 설치
-        run: pnpm install --global vercel@latest
-
-      - name: Vercel 환경 정보 가져오기
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: 프로젝트 빌드
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Vercel에 프로젝트 배포
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Test get variable exported by push-to-another-repository
+        run: echo $DESTINATION_CLONED_DIRECTORY
