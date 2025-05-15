@@ -1,4 +1,4 @@
-name: Preview 버전 (staging 브랜치 사용)
+name: staging 브랜치
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -6,42 +6,36 @@ env:
 
 on:
   push:
-    branches: # 병합 후 배포
-      - staging
-  pull_request: # 병합되기 전에 테스트
     branches:
       - staging
-  workflow_dispatch: # 수동 실행 옵션
 
 jobs:
-  Sync-Fork-Repository:
+  build:
     runs-on: ubuntu-latest
-    # PR인 경우에는 이 작업 건너뛰기 (포크 푸시는 실제 병합 후에만 필요)
-    if: github.event_name != 'pull_request'
+    container: pandoc/latex
     steps:
-      - name: Github Repository 파일 가져오기
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # 전체 히스토리 가져오기
-
-      - name: 포크 리포지토리로 푸시
+      - uses: actions/checkout@v4
+      - name: Install mustache (to update the date)
+        run: apk add ruby && gem install mustache
+      - name: creates output
+        run: sh ./build.sh
+      - name: Pushes to another repository
+        id: push_directory
         uses: cpina/github-action-push-to-another-repository@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.AUTO_ACTIONS }}
         with:
-          source-directory: '.' # 전체 리포지토리 푸시
-          destination-github-username: window-ook
-          destination-repository-name: meet2-web
+          source-directory: 'output'
+          destination-github-username: 'window-ook'
+          destination-repository-name: 'meet2-web'
           user-email: ${{ secrets.EMAIL }}
-          commit-message: ${{ github.event.commits[0].message || 'Update from team repository' }}
-          target-branch: staging # 포크의 staging 브랜치로 푸시
+          commit-message: ${{ github.event.commits[0].message }}
+          target-branch: staging
+      - name: Test get variable exported by push-to-another-repository
+        run: echo $DESTINATION_CLONED_DIRECTORY
 
   Deploy-Production:
     runs-on: ubuntu-latest
-    # PR이거나 포크 동기화가 완료된 후에 실행
-    needs: [Sync-Fork-Repository]
-    # PR일 경우 Sync-Fork-Repository 작업 없이 이 작업부터 시작
-    if: github.event_name == 'pull_request' || success()
 
     steps:
       - name: Github Repository 파일 가져오기
@@ -78,12 +72,13 @@ jobs:
         run: pnpm run test
 
       - name: Vercel CLI 설치
-        run: npm install --global vercel@latest
+        run: pnpm install --global vercel@latest
 
       - name: Vercel 환경 정보 가져오기
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: 프로젝트 빌드
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Vercel에 프로젝트 배포
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
