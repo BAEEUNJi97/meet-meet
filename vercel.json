@@ -1,8 +1,9 @@
 {
     "git": {
-        "deploymentEnabled": false
+        "deploymentEnabled": {
+            "staging": true
+        }
     },
-    "buildCommand": "pnpm build",
-    "outputDirectory": "dist",
-    "framework": "nextjs"
+    "framework": "nextjs",
+    "outputDirectory": ".next"
 }
