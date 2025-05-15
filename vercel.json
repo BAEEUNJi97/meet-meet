@@ -2,5 +2,7 @@
     "git": {
         "deploymentEnabled": false
     },
-    "outputDirectory": ".next"
+    "buildCommand": "pnpm build",
+    "outputDirectory": "dist",
+    "framework": "nextjs"
 }
