@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import ProfileCard from "../../../components/mypage/ProfileCard"
 import Image from "next/image";
