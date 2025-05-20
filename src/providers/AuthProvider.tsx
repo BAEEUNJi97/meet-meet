@@ -36,7 +36,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
             const result = await axios.post('/api/auth/signup', { email, password, name, companyName })
             if (result.status === 200) {
                 alert('회원가입이 완료되었습니다.')
-                router.replace('/signin')
+                router.replace('/login')
             }
         } catch (error) {
             throw error;
@@ -103,16 +103,16 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     }, []);
 
     useEffect(() => {
-        if (pathname !== '/signin' && !pathname.includes('/auth/')) setPreviousPath(pathname);
+        if (pathname !== '/login' && !pathname.includes('/auth/')) setPreviousPath(pathname);
     }, [pathname]);
 
     useEffect(() => {
         if (!isLoading && !token && pathname.startsWith('/mypage')) {
             alert('로그인이 필요합니다.')
-            router.replace('/signin');
+            router.replace('/login');
         }
 
-        if (!isLoading && token && pathname === '/signin') router.replace(previousPath);
+        if (!isLoading && token && pathname === '/login') router.replace(previousPath);
     }, [isLoading, token, pathname, router, previousPath]);
 
     return (

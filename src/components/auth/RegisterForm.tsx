@@ -57,7 +57,7 @@ export default function RegisterForm() {
     }, [password, passwordCheck]);
 
     return (
-        <section className='w-[31rem] py-4 bg-white rounded-lg shadow-md flex flex-col items-center justify-center'>
+        <section className='w-[24rem] h-[44.5rem] md:w-[31rem] md:h-[40.5rem] py-4 bg-white rounded-lg shadow-md flex flex-col items-center justify-center'>
             <form
                 onSubmit={handleSubmit(onSubmit)}
                 className='w-4/5 flex flex-col gap-4'>
@@ -141,7 +141,7 @@ export default function RegisterForm() {
                     text="확인"
                 />
                 <FormFooter
-                    route="/signin"
+                    route="/login"
                     description="이미 계정이 있으신가요?"
                     text="로그인"
                 />
