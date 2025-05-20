@@ -53,7 +53,7 @@ export default function LoginForm() {
     };
 
     return (
-        <section className='w-[31rem] py-4 bg-white rounded-lg shadow-md flex flex-col items-center justify-center'>
+        <div className='w-[24rem] md:w-[31rem] h-[26.5rem] py-4 bg-white rounded-lg shadow-md flex flex-col items-center justify-center'>
             <form
                 onSubmit={handleSubmit(onSubmit)}
                 className='w-4/5 flex flex-col gap-8'
@@ -88,12 +88,12 @@ export default function LoginForm() {
                     text="로그인"
                 />
                 <FormFooter
-                    route="/signup"
+                    route="/register"
                     description="MeetMeet이 처음이신가요?"
                     text="회원가입"
                 />
             </form>
-        </section>
+        </div>
     );
 }
 

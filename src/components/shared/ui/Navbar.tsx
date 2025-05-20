@@ -33,7 +33,7 @@ export default function Navbar() {
                         <button onClick={() => signout()} className='cursor-pointer hover:opacity-50 duration-300 ease-in-out'>로그아웃</button>
                     </div>
                 )}
-                {!token && <Link href='/signin' className='hover:opacity-50 duration-300 ease-in-out'>로그인</Link>}
+                {!token && <Link href='/login' className='hover:opacity-50 duration-300 ease-in-out'>로그인</Link>}
             </section>
         </nav>
     );

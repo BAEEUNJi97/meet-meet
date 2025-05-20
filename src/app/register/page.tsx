@@ -1,10 +1,10 @@
 import AuthPoster from '@/components/auth/AuthPoster';
 import RegisterForm from '@/components/auth/RegisterForm';
 
-export default function SignupPage() {
+export default function RegisterPage() {
 
     return (
-        <div className='w-screen h-screen flex items-center justify-center gap-20'>
+        <div className='w-full h-full py-20 flex flex-col lg:flex-row items-center justify-center gap-0 lg:gap-20'>
             <AuthPoster />
             <RegisterForm />
         </div>
