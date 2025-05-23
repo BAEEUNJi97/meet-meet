@@ -46,7 +46,6 @@ export default function GatheringsList({
     const queryClient = useQueryClient();
     const observerRef = useRef<IntersectionObserver | null>(null);
     
-    // 무한스크롤 활성화 상태
     const [infiniteScrollEnabled, setInfiniteScrollEnabled] = useState(false);
     
     // SSR 데이터 확인
