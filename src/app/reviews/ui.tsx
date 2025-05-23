@@ -1,45 +1,123 @@
 'use client';
 
 
-import Image from 'next/image';
+import { useState } from "react";
+import Image from "next/image";
 
 
 
 export default function LikedMeetingsPage() {
- 
-  return (
-    <main className="contents-container">
-    {/* ✅ 로고 + 텍스트 묶음 */}
-      <div className="flex items-center gap-[13px] h-[72px]">
-        <div className="w-[72px] h-[72px]">
-           <Image src="/icons/saved-logo.svg" alt="찜 아이콘" width={72} height={72} className="pointer-events-none" />
-        </div>
-        <div className="flex flex-col justify-center gap-[4px]">
-          <h1 className="text-[24px] font-semibold leading-[32px] text-gray-900">
-            모든 리뷰
-          </h1>
-          <p className="text-[14px] font-medium leading-[20px] text-gray-700">
-           미밋을 이용한 분들은 이렇게 느꼈어요 ♥️
-          </p>
-        </div>
-      </div>
-      <div className="">
-      <div className="flex items-center justify-between  ">
-        <div className=" flex ">
-          <button className="px-4 py-2 border-b-2 border-[#A864E4] font-medium text-[#] flex items-center">
-            달램핏 <span className="ml-1">☪️</span>
-          </button>
-        </div>
-        <div className="flex-1 flex ">
-          <button className="px-4 py-2 text-gray-500 flex items-center">
-            위케이션 <span className="ml-1">⭐</span>
-          </button>
-        </div>
-      </div>
-    </div>
-      
+  
+  const [selectedTabId, setSelectedTabId]= useState(0)
 
-      
-    </main>
-  );
+  return (
+        <>
+        {/* 나의 모임 & 나의 리뷰 ~ */}
+        {/* 배경색을 흰색으로 만든다 */}
+        <div className="bg-white border-t border-gray-500">
+            <div className="flex gap-2">
+                {/* 0 */}
+                <div
+                    onClick={() => setSelectedTabId(0)}
+                 className={`${selectedTabId === 0 ? "border-b text-black" : "text-gray-500"}`}>
+                    모든 리뷰 페이지
+                </div>
+                {/* 1 */}
+                <div 
+                onClick={() => setSelectedTabId(1)}
+                className={`${selectedTabId === 1 ? " border-b text-black" : "text-gray-500"}`}>
+                    나의 리뷰
+                </div>
+                {/* 2 */}
+                <div 
+                onClick={() => setSelectedTabId(2)}
+                className={`${selectedTabId === 2 ? " border-b text-black" : "text-gray-500"}`}>
+                    내가 만든 모임
+                </div>
+            </div>
+            {/* 모임 목록  */}
+            <div >
+                {/* 모임1 */}
+                <div className="flex border-b-2 border-dotted p-4">
+                    <Image 
+                        src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fG1lZXRpbmd8ZW58MHx8MHx8fDA%3D"
+                        width={200}
+                        height={150}
+                        alt="모임 이미지"
+                    />
+                    <div>
+                        <span>
+                            이용 예정
+                        </span>
+                        <span>
+                            개설 확정
+                        </span>
+                        <h3>달램핏 오피스 스트레칭 | <span>을지로 3가</span> </h3>
+                        <span>
+                            1월 7일 . 17:30
+                        </span>
+                        <span>
+                            20/20
+                        </span>
+
+                        <button>예약 취소하기</button>
+                    </div>
+                </div> 
+                {/* 모임2 */}
+                <div className="flex border-b-2 border-dotted p-4">
+                    <Image 
+                        src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fG1lZXRpbmd8ZW58MHx8MHx8fDA%3D"
+                        width={200}
+                        height={150}
+                        alt="모임 이미지"
+                    />
+                    <div>
+                        <span>
+                            이용 예정
+                        </span>
+                        <span>
+                            개설 확정
+                        </span>
+                        <h3>달램핏 오피스 스트레칭 | <span>을지로 3가</span> </h3>
+                        <span>
+                            1월 7일 . 17:30
+                        </span>
+                        <span>
+                            20/20
+                        </span>
+
+                        <button>예약 취소하기</button>
+                    </div>
+                </div> 
+                {/* 모임3 */}
+                <div className="flex border-b-2 border-dotted p-4">
+                    <Image 
+                        src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fG1lZXRpbmd8ZW58MHx8MHx8fDA%3D"
+                        width={200}
+                        height={150}
+                        alt="모임 이미지"
+                    />
+                    <div>
+                        <span>
+                            이용 예정
+                        </span>
+                        <span>
+                            개설 확정
+                        </span>
+                        <h3>달램핏 오피스 스트레칭 | <span>을지로 3가</span> </h3>
+                        <span>
+                            1월 7일 . 17:30
+                        </span>
+                        <span>
+                            20/20
+                        </span>
+
+                        <button>예약 취소하기</button>
+                    </div>
+                </div> 
+            </div>
+        </div>
+        </>
+
+    )
 }
