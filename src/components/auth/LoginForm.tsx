@@ -26,6 +26,7 @@ export default function LoginForm() {
 
     const {
         register,
+        watch,
         handleSubmit,
         formState: { errors, isSubmitting, isSubmitted },
     } = useForm<SigninFormSchemaType>({
@@ -35,6 +36,9 @@ export default function LoginForm() {
             password: '12312!2a',
         },
     });
+
+    const email = watch('email');
+    const password = watch('password');
 
     const onSubmit = async (data: SigninFormSchemaType) => {
         setErrorResponseMessage(null);
@@ -53,7 +57,7 @@ export default function LoginForm() {
     };
 
     return (
-        <section className='w-[31rem] py-4 bg-white rounded-lg shadow-md flex flex-col items-center justify-center'>
+        <div className='w-[24rem] md:w-[31rem] h-[26.5rem] py-4 bg-white rounded-lg shadow-md flex flex-col items-center justify-center'>
             <form
                 onSubmit={handleSubmit(onSubmit)}
                 className='w-4/5 flex flex-col gap-8'
@@ -86,14 +90,15 @@ export default function LoginForm() {
                     isSubmitting={isSubmitting}
                     isPasswordMatch={true}
                     text="로그인"
+                    props={{ email, password }}
                 />
                 <FormFooter
-                    route="/signup"
+                    route="/register"
                     description="MeetMeet이 처음이신가요?"
                     text="회원가입"
                 />
             </form>
-        </section>
+        </div>
     );
 }
 

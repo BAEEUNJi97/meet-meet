@@ -1,8 +1,8 @@
 "use client"
 
-
 import { useState, useRef, useCallback } from "react";
 import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import axios from "axios";
 import Image from "next/image";
 import { Gathering } from "@/lib/types/gatherings";
