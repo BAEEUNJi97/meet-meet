@@ -183,6 +183,7 @@ export default function CreateMeetingModal({ onClose }: { onClose: () => void })
                 <form 
                     className="flex flex-col md:w-xl w-full h-full md:m-auto p-5 bg-white md:rounded-lg"
                     onSubmit={handleSubmit}
+            
                 >
                     {/* 모임 만들기 타이틀 */}
                     <div className="w-full h-[50px] bg-white rounded-lg flex flex-row justify-between items-center mb-5">
@@ -292,7 +293,7 @@ export default function CreateMeetingModal({ onClose }: { onClose: () => void })
                             />
                         </div>
                     </div>
-                    
+
                     {/* 모집정원 */}
                     <div className="w-full mb-5">
                         <h1 className="font-bold text-gray-800 mb-3">모집 정원</h1>

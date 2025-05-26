@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
 } catch (error) {
     console.error('API 요청 중 오류 발생:', error);
 
+
     if(axios.isAxiosError(error)) {
         if (error.response) {
             console.error('서버 응답 상태:', error.response.status);

@@ -41,7 +41,8 @@ export default function Meeting({ data }: MeetingProps) {
           alt={`${name} 이미지`}
           width={100}
           height={100}
-          className="rounded-lg object-cover my-2"
+          className="rounded-lg object-cover my-2 pointer-events-none"
+          
         />
       )}
 
