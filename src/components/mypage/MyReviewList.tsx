@@ -1,10 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
 import { useRouter } from 'next/navigation';
 import axios from "axios";
 import Image from "next/image";
+import { AuthContext } from "@/providers/AuthProvider";
 
 interface Gathering {
   id: string;
@@ -21,21 +22,14 @@ interface Gathering {
 
 export default function MyReviewList() {
   const [reviews, setReviews] = useState(0);
-  const [isClient, setIsClient] = useState(false);
+  const { token } = useContext(AuthContext);
   const router = useRouter();
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
-  const fetchGatherings = async () => {
-    if (!token) throw new Error("토큰 없음");
-    const { data } = await axios.get("/api/gatherings/joined", {
+  const fetchGatherings = (token: string): Promise<Gathering[]> => {
+    return axios.get("/api/gatherings/joined", {
       headers: { Authorization: `Bearer ${token}` },
-    });
-    return data;
+    }).then(res => res.data);
   };
 
   const {
@@ -43,19 +37,17 @@ export default function MyReviewList() {
     isLoading,
     error,
   } = useQuery<Gathering[], Error>({
-    queryKey: ["myReviewGatherings"],
-    queryFn: fetchGatherings,
-    enabled: isClient && !!token,
+    queryKey: ["myReviewGatherings", token],
+    queryFn: () => fetchGatherings(token!),
+    enabled: !!token,
   });
 
   const reviewedGatherings = gatherings.filter((g) => g.isReviewed);
   const writableGatherings = gatherings.filter((g) => !g.isReviewed);
-
-  const isEmpty =
-    (reviews === 0 && writableGatherings.length === 0) ||
-    (reviews === 1 && reviewedGatherings.length === 0);
-
   const list = reviews === 0 ? writableGatherings : reviewedGatherings;
+
+  const isSuccess = !isLoading && !error;
+  const isEmpty = isSuccess && list.length === 0;
 
   return (
     <div className="w-full flex flex-col justify-start gap-5">
