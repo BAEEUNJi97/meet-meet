@@ -7,6 +7,7 @@ import { formatDate, formatTime, getTimeRemaining } from '@/components/shared/ut
 import { Heart, Check } from "lucide-react"
 import { PageProps } from '@/types/pageprops';
 import { useSavedGatherings } from '@/components/gatherings/shared/hooks/useSavedGatherings';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import useGatheringDetail from '@/hooks/gathering/useGatheringDetail';
 import useGatheringJoinChecking from '@/hooks/gathering/useGatheringJoinChecking';
 import useJoinGathering from '@/hooks/gathering/useJoinGathering';
@@ -124,22 +125,46 @@ export default function GatheringsDetailPageUI({ params }: PageProps) {
                             <div className="flex justify-between text-sm">
                                 <div className="flex items-center gap-2">
                                     <span>모집 정원 {detail?.participantCount}명</span>
-                                    <div className="flex items-center">
-                                        {participants?.slice(0, 4).map((participant: Participant, i: number) => (
-                                            <Image
-                                                key={participant?.User?.id}
-                                                src={participant?.User?.image || '/images/default_profile_image.svg'}
-                                                alt="프로필 이미지"
-                                                width={100}
-                                                height={100}
-                                                className={`w-8 h-8 rounded-full border-2 border-white ${i === 0 ? 'ml-0' : '-ml-2'}`}
-                                            />
-                                        ))}
-                                        <div className='w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center'>
-                                            <span className='text-sm font-semibold'>{participants?.length - 4 > 0 ? `+${participants?.length - 4}` : '+10'}</span>
-                                        </div>
-                                    </div>
                                     {/* 정원들의 프로필 이미지 */}
+                                    <TooltipProvider>
+                                        <div className="flex items-center">
+                                            {participants?.slice(0, 4).map((participant: Participant, i: number) => (
+                                                <Image
+                                                    key={participant?.User?.id}
+                                                    src={participant?.User?.image || '/images/default_profile_image.svg'}
+                                                    alt="프로필 이미지"
+                                                    width={100}
+                                                    height={100}
+                                                    className={`w-8 h-8 rounded-full border-2 border-white ${i === 0 ? 'ml-0' : '-ml-2'}`}
+                                                />
+                                            ))}
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <div className="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center cursor-pointer">
+                                                        <span className='text-sm font-semibold'>
+                                                            {participants?.length - 4 > 0 ? `+${participants?.length - 4}` : '+0'}
+                                                        </span>
+                                                    </div>
+                                                </TooltipTrigger>
+                                                <TooltipContent side="top" align="center" className="flex gap-1 bg-white border border-gray-300 rounded-lg p-2 shadow-lg">
+                                                    {participants?.slice(4).length > 0 ? (
+                                                        participants?.slice(4).map((participant: Participant, i: number) => (
+                                                            <Image
+                                                                key={participant?.User?.id}
+                                                                src={participant?.User?.image || '/images/default_profile_image.svg'}
+                                                                alt="프로필 이미지"
+                                                                width={100}
+                                                                height={100}
+                                                                className={`w-8 h-8 rounded-full border-2 border-white ${i === 0 ? 'ml-0' : '-ml-2'}`}
+                                                            />
+                                                        ))
+                                                    ) : (
+                                                        <span className="text-xs text-gray-400">아직 없습니다</span>
+                                                    )}
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </div>
+                                    </TooltipProvider>
                                 </div>
                                 {detail && detail?.participantCount > 0 ? (
                                     <div className='flex items-center gap-2'>
