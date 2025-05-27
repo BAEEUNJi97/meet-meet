@@ -34,7 +34,6 @@ export const fetchJoinedMeetings = async (token: string, queries: string): Promi
   const { data } = await axios.get(`/api/gatherings/joined?${queries}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
-  console.log(`/api/gatherings/joined?${queries}`);
   return data;
 };
 
@@ -67,7 +66,7 @@ export default function MyPageUI() {
           <div className="bg-white border-t-[3px] border-gray-800">
             <div className="pt-8 flex gap-4 text-lg font-bold p-5">
               {[
-                { label: "나의 모임", value: MypageTab.JoinedMeetings },
+                { label: "참여중인 모임", value: MypageTab.JoinedMeetings },
                 { label: "나의 리뷰", value: MypageTab.MyReviews },
                 { label: "내가 만든 모임", value: MypageTab.CreatedMeetings },
               ].map(({ label, value }) => (

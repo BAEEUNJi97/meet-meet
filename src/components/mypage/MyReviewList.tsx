@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import Image from "next/image";
 import { AuthContext } from "@/providers/AuthProvider";
+import ReviewModal from "./ReviewModal";
 
 interface Gathering {
   id: string;
@@ -22,8 +23,15 @@ interface Gathering {
 
 export default function MyReviewList() {
   const [reviews, setReviews] = useState(0);
-  const { token } = useContext(AuthContext);
+ 
+  const teamId = process.env.TEAM_ID_DEV!;
+  const { token, userId } = useContext(AuthContext);
   const router = useRouter();
+  const [selectedReviewData, setSelectedReviewData] = useState<{
+    teamId: string;
+    userId: number;
+    gatheringId: number;
+  } | null>(null);
 
   const fetchGatherings = (token: string): Promise<Gathering[]> => {
     return axios
@@ -40,7 +48,7 @@ export default function MyReviewList() {
   } = useQuery<Gathering[], Error>({
     queryKey: ["myReviewGatherings", token],
     queryFn: () => fetchGatherings(token!),
-    enabled: !!token,
+    enabled: !!token && !!userId,
   });
 
   const reviewedGatherings = gatherings.filter((g) => g.isReviewed);
@@ -92,7 +100,6 @@ export default function MyReviewList() {
           </h1>
         </div>
       ) : (
-        // 리뷰 목록
         <div className="flex flex-col gap-4">
           {list.map((g) => (
             <div
@@ -123,12 +130,17 @@ export default function MyReviewList() {
                 )}
               </div>
 
-              {/* ✅ 리뷰 작성 버튼은 작성 가능한 리뷰 탭에서만 */}
               {reviews === 0 && (
                 <div className="mt-4 self-end">
                   <button
                     className="bg-main-500 text-white text-sm px-4 py-2 rounded-md hover:bg-main-600 transition-colors"
-                    onClick={() => router.push(`/mypage/reviews/write/${g.id}`)}
+                    onClick={() =>
+                      setSelectedReviewData({
+                        teamId: teamId, 
+                        userId: userId,
+                        gatheringId: Number(g.id),
+                      })
+                    }
                   >
                     리뷰 작성하기
                   </button>
@@ -136,7 +148,13 @@ export default function MyReviewList() {
               )}
             </div>
           ))}
-        </div>
+        </div>        
+      )}
+      {selectedReviewData && (
+        <ReviewModal
+          reviewData={selectedReviewData}
+          onClose={() => setSelectedReviewData(null)}
+        />
       )}
     </div>
   );
