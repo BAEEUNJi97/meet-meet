@@ -52,14 +52,11 @@ export default function CreateMeetingModal({ onClose }: { onClose: () => void })
     
     // 모달이 열릴 때 스크롤 방지 
     useEffect(() => {
-        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-        
+        const originalBodyOverFlow = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
-        document.body.style.paddingRight = `${scrollbarWidth}px`;
         
         return () => {
-            document.body.style.overflow = 'unset';
-            document.body.style.paddingRight = '0px';
+            document.body.style.overflow = originalBodyOverFlow;
         };
     }, []);
     
@@ -75,8 +72,23 @@ export default function CreateMeetingModal({ onClose }: { onClose: () => void })
         
         if (files && files.length > 0) {
             const file = files[0]; // 첫 번째 파일만 사용
+
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if(file.size > maxSize){
+                setError("이미지 파일 크기가 너무 큽니다. 5MB 이하로 첨부해주세요.");
+                return;
+            }
+
+            // 이미지 타입 검증
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'image/avif', 'image/webp'];
+            if(!allowedTypes.includes(file.type)){
+                setError("이미지 파일 타입이 맞지않습니다.jpg, png, gif, svg, avi, webp 파일만 가능합니다.");
+                return;
+            }
+
             setFileName(file.name); // 파일명 상태 업데이트
             setImageFile(file); // 파일 객체 저장
+            setError(null);
         }
     };
     
@@ -176,149 +188,154 @@ export default function CreateMeetingModal({ onClose }: { onClose: () => void })
     
     return (
         <div className="fixed inset-0 z-50">
-            {/* 배경 어둡게 */}
+            {/* 배경 */}
             <div className="absolute inset-0 bg-black opacity-50"></div>
-            {/* 모달 컨테이너 */}
-            <div className="relative flex flex-col justify-center items-center md:top-10">
-                <form 
-                    className="flex flex-col md:w-xl w-full h-full md:m-auto p-5 bg-white md:rounded-lg"
-                    onSubmit={handleSubmit}
             
-                >
-                    {/* 모임 만들기 타이틀 */}
-                    <div className="w-full h-[50px] bg-white rounded-lg flex flex-row justify-between items-center mb-5">
-                        <h1 className="text-lg font-bold text-gray-800">모임 만들기</h1>
-                        <button type="button" onClick={onClose}>
-                            <XIcon className="w-7 h-7 text-gray-500" />
-                        </button>
-                    </div>
-                    
-                    {/* 에러 메시지 */}
-                    {error && (
-                        <div className="w-full mb-5 p-3 bg-red-100 text-red-600 rounded-lg">
-                            {error}
+            {/* 모달 컨테이너 */}
+            <div className="relative w-full h-full flex items-center justify-center md:p-4">
+                <div className="w-full max-w-2xl max-h-full flex flex-col">
+                    <form 
+                        className="flex flex-col w-full h-full bg-white md:rounded-lg shadow-xl overflow-hidden"
+                        onSubmit={handleSubmit}
+                    >
+                        {/* 모임 만들기 타이틀*/}
+                        <div className="w-full h-[60px] bg-white md:rounded-t-lg flex flex-row justify-between items-center px-5 border-b border-gray-100 flex-shrink-0">
+                            <h1 className="text-lg font-bold text-gray-800">모임 만들기</h1>
+                            <button type="button" onClick={onClose}>
+                                <XIcon className="w-7 h-7 text-gray-500" />
+                            </button>
                         </div>
-                    )}
-                    
-                    {/* 모임 이름 */}
-                    <div className="w-full mb-5">
-                        <h1 className="font-bold text-gray-800 mb-3">모임 이름</h1>
-                        <input 
-                            type="text" 
-                            name="name"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                            className="w-full h-[44px] rounded-lg bg-gray-50 py-2 px-4 text-semibold" 
-                            placeholder="모임 이름을 입력해주세요" 
-                        />
-                    </div>
-                    
-                    {/* 장소 선택 */}
-                    <div className="w-full mb-5">
-                        <h1 className="font-bold text-gray-800 mb-3">장소</h1>
-                        <select 
-                            name="location"
-                            value={formData.location}
-                            onChange={handleInputChange}
-                            className="w-full h-[44px] rounded-lg bg-gray-50 py-2 px-4 text-semibold appearance-none bg-[url('/icons/polygon_down.svg')] bg-[length:13px_13px] bg-[right_16px_center] bg-no-repeat"
-                        >
-                            <option value="">장소를 선택해주세요</option>
-                            <option value="을지로3가">을지로3가</option>
-                            <option value="건대입구">건대입구</option>
-                            <option value="신림">신림</option>
-                            <option value="홍대입구">홍대입구</option> 
-                        </select>
-                    </div>
-                    
-                    {/* 이미지 첨부 */}
-                    <div className="w-full mb-5">
-                        <h1 className="font-bold text-gray-800 mb-3">이미지</h1>
-                        <div className="w-full flex flex-row items-center gap-5">
-                            <input 
-                                type="text" 
-                                className="w-full h-[44px] rounded-lg bg-gray-50 py-2 px-4 text-semibold" 
-                                placeholder="이미지를 첨부해주세요" 
-                                value={fileName}
-                                readOnly
-                            />
-                            <div 
-                                className="w-[100px] h-[44px] border-2 border-main-500 text-main-500 font-semibold text-sm px-2 rounded-lg flex flex-row items-center justify-center cursor-pointer hover:bg-main-50"
-                                onClick={handleFileButtonClick}
-                            >
-                                <p>파일 추가</p>
+
+                        {/* 콘텐츠 영역 */}
+                        <div className="flex-1 overflow-y-auto p-5">
+                            {/* 에러 메시지 */}
+                            {error && (
+                                <div className="w-full mb-5 p-3 bg-red-100 text-red-600 rounded-lg">
+                                    {error}
+                                </div>
+                            )}
+                            
+                            {/* 모임 이름 */}
+                            <div className="w-full mb-5">
+                                <h1 className="font-bold text-gray-800 mb-3">모임 이름</h1>
+                                <input 
+                                    type="text" 
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    className="w-full h-[44px] rounded-lg bg-gray-50 py-2 px-4 text-semibold" 
+                                    placeholder="모임 이름을 입력해주세요" 
+                                />
                             </div>
-                            <input 
-                                type="file"
-                                ref={fileInputRef}
-                                className="hidden"
-                                onChange={handleFileChange}
-                                accept="image/*"
-                            />
-                        </div>
-                    </div>
-                    
-                    {/* 서비스 선택 컴포넌트 */}
-                    <SelectionService selectedType={formData.type} onSelect={handleServiceTypeSelect} />
-                    
-                    {/* 날짜 선택 */}
-                    <div className="w-full mb-5 flex flex-col md:flex-row items-center gap-5">
-                        {/* 모임 날짜 */}
-                        <div className="w-full flex flex-col">
-                            <h1 className="font-bold text-gray-800 mb-3">모임 날짜</h1>
-                            <DatePicker
-                                selected={meetingDate}
-                                onChange={(date) => setMeetingDate(date)}
-                                className="w-[70%] md:w-full h-[44px] rounded-lg bg-gray-50 py-2 px-4 text-semibold"
-                                dateFormat="yyyy-MM-dd HH:mm"
-                                showTimeSelect
-                                timeFormat="HH:mm"
-                                timeIntervals={30}
-                                placeholderText="날짜와 시간을 선택해주세요"
-                            />
+                            
+                            {/* 장소 선택 */}
+                            <div className="w-full mb-5">
+                                <h1 className="font-bold text-gray-800 mb-3">장소</h1>
+                                <select 
+                                    name="location"
+                                    value={formData.location}
+                                    onChange={handleInputChange}
+                                    className="w-full h-[44px] rounded-lg bg-gray-50 py-2 px-4 text-semibold appearance-none bg-[url('/icons/polygon_down.svg')] bg-[length:13px_13px] bg-[right_16px_center] bg-no-repeat"
+                                >
+                                    <option value="">장소를 선택해주세요</option>
+                                    <option value="을지로3가">을지로3가</option>
+                                    <option value="건대입구">건대입구</option>
+                                    <option value="신림">신림</option>
+                                    <option value="홍대입구">홍대입구</option> 
+                                </select>
+                            </div>
+                            
+                            {/* 이미지 첨부 */}
+                            <div className="w-full mb-5">
+                                <h1 className="font-bold text-gray-800 mb-3">이미지</h1>
+                                <div className="w-full flex flex-row items-center gap-5">
+                                    <input 
+                                        type="text" 
+                                        className="w-full h-[44px] rounded-lg bg-gray-50 py-2 px-4 text-semibold" 
+                                        placeholder="이미지를 첨부해주세요" 
+                                        value={fileName}
+                                        readOnly
+                                    />
+                                    <div 
+                                        className="w-[100px] h-[44px] border-2 border-main-500 text-main-500 font-semibold text-sm px-2 rounded-lg flex flex-row items-center justify-center cursor-pointer hover:bg-main-50"
+                                        onClick={handleFileButtonClick}
+                                    >
+                                        <p>파일 추가</p>
+                                    </div>
+                                    <input 
+                                        type="file"
+                                        ref={fileInputRef}
+                                        className="hidden"
+                                        onChange={handleFileChange}
+                                        accept="image/*"
+                                    />
+                                </div>
+                            </div>
+                            
+                            {/* 서비스 선택 컴포넌트 */}
+                            <SelectionService selectedType={formData.type} onSelect={handleServiceTypeSelect} />
+                            
+                            {/* 날짜 선택 */}
+                            <div className="w-full mb-5 flex flex-col md:flex-row items-center gap-5">
+                                {/* 모임 날짜 */}
+                                <div className="w-full flex flex-col">
+                                    <h1 className="font-bold text-gray-800 mb-3">모임 날짜</h1>
+                                    <DatePicker
+                                        selected={meetingDate}
+                                        onChange={(date) => setMeetingDate(date)}
+                                        className="w-[70%] md:w-full h-[44px] rounded-lg bg-gray-50 py-2 px-4 text-semibold"
+                                        dateFormat="yyyy-MM-dd HH:mm"
+                                        showTimeSelect
+                                        timeFormat="HH:mm"
+                                        timeIntervals={30}
+                                        placeholderText="날짜와 시간을 선택해주세요"
+                                    />
+                                </div>
+                                
+                                {/* 마감 날짜 */}
+                                <div className="w-full flex flex-col">
+                                    <h1 className="font-bold text-gray-800 mb-3">마감 날짜</h1>
+                                    <DatePicker
+                                        selected={deadlineDate}
+                                        onChange={(date) => setDeadlineDate(date)}
+                                        className="w-[70%] md:w-full h-[44px] rounded-lg bg-gray-50 py-2 px-4 text-semibold"
+                                        dateFormat="yyyy-MM-dd HH:mm"
+                                        showTimeSelect
+                                        timeFormat="HH:mm"
+                                        timeIntervals={30}
+                                        placeholderText="날짜와 시간을 선택해주세요"
+                                        maxDate={meetingDate ? new Date(meetingDate.getTime() + 1000) : undefined}
+                                    />
+                                </div>
+                            </div>
+                            
+                            {/* 모집정원 */}
+                            <div className="w-full mb-5">
+                                <h1 className="font-bold text-gray-800 mb-3">모집 정원</h1>
+                                <input 
+                                    type="number"
+                                    name="capacity"
+                                    value={formData.capacity}
+                                    onChange={handleInputChange}
+                                    min="5"
+                                    className="w-full h-[44px] rounded-lg bg-gray-50 py-2 px-4 text-semibold" 
+                                    placeholder="최소 5인 이상 입력해주세요."
+                                />
+                            </div>
                         </div>
                         
-                        {/* 마감 날짜 */}
-                        <div className="w-full flex flex-col">
-                            <h1 className="font-bold text-gray-800 mb-3">마감 날짜</h1>
-                            <DatePicker
-                                selected={deadlineDate}
-                                onChange={(date) => setDeadlineDate(date)}
-                                className="w-[70%] md:w-full h-[44px] rounded-lg bg-gray-50 py-2 px-4 text-semibold"
-                                dateFormat="yyyy-MM-dd HH:mm"
-                                showTimeSelect
-                                timeFormat="HH:mm"
-                                timeIntervals={30}
-                                placeholderText="날짜와 시간을 선택해주세요"
-                                maxDate={meetingDate ? new Date(meetingDate.getTime() + 1000) : undefined} // 모임 날짜 이후는 선택 불가
-                            />
+                        {/* 제출 버튼*/}
+                        <div className="w-full p-5 bg-white md:rounded-b-lg flex-shrink-0">
+                            <button
+                                type="submit"
+                                className="w-full bg-main-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-main-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? '처리 중...' : '확인'}
+                            </button>
                         </div>
-                    </div>
-
-                    {/* 모집정원 */}
-                    <div className="w-full mb-5">
-                        <h1 className="font-bold text-gray-800 mb-3">모집 정원</h1>
-                        <input 
-                            type="number"
-                            name="capacity"
-                            value={formData.capacity}
-                            onChange={handleInputChange}
-                            min="5"
-                            className="w-full h-[44px] rounded-lg bg-gray-50 py-2 px-4 text-semibold" 
-                            placeholder="최소 5인 이상 입력해주세요."
-                        />
-                    </div>
-                    
-                    {/* 제출 버튼 */}
-                    <div className="w-full">
-                        <button
-                            type="submit"
-                            className="w-full bg-main-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-main-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? '처리 중...' : '확인'}
-                        </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     );
