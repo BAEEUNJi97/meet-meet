@@ -93,12 +93,6 @@ export default function LikedMeetingsPage() {
 
   return (
     <main className="contents-container">
-      <div className="w-full bg-gray-100 p-3 rounded-md mb-4 text-sm text-gray-700 space-y-1 border border-gray-300">
-        <p><strong>총 모임 수:</strong> {gathering.length}</p>
-        <p><strong>찜한 모임 수:</strong> {likedList.length}</p>
-        <p><strong>필터 적용 후:</strong> {filteredGatherings.length}</p>
-        <p><strong>현재 보여지는 개수:</strong> {visibleGatherings.length}</p>
-      </div>
       <div className="w-full flex flex-col">
         <div className="w-full pt-10 flex flex-row justify-between items-center">
           <Image src="/icons/saved-logo.svg" alt="찜 아이콘" width={70} height={70} className="rounded-full border-2 border-black mr-1 pointer-events-none" priority />
