@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import Image from "next/image";
-import { Gathering } from "@/types/gatherings";
+import Image from 'next/image';
 import GatheringsList from '@/components/gatherings/GatheringsList';
-import { useSavedGatherings } from "@/components/gatherings/shared/hooks/useSavedGatherings";
+import { Gathering } from '@/types/gatherings';
+import { useToggleSavedGatherings } from '@/hooks/gathering/useToggleSavedGatherings';
 import axios from 'axios';
 
 export enum Category {
@@ -28,7 +28,15 @@ const DALLAEMFIT_LABEL: Record<DallaemfitType, string> = {
 const ITEMS_PER_PAGE = 10;
 
 export default function LikedMeetingsPage() {
-  const { savedIds: likedList } = useSavedGatherings();
+  const { savedIds: likedList, toggleSaved } = useToggleSavedGatherings();
+
+  const { data: allGatherings = [] } = useQuery<Gathering[]>({
+    queryKey: ['allGatherings'],
+    queryFn: async () => {
+      const res = await axios.get('/api/gatherings');
+      return res.data;
+    },
+  });
 
   const [filter, setFilter] = useState({
     category: Category.DALLAEMFIT,
@@ -38,21 +46,11 @@ export default function LikedMeetingsPage() {
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  const { data: gathering = [] } = useQuery<Gathering[]>({
-    queryKey: ['allGatherings'],
-    queryFn: async () => {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('/api/gatherings', {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      });
-      return res.data;
-    },
-  });
-
-  const filteredGatherings = gathering.filter((g) => {
+  const filteredGatherings = allGatherings.filter((g) => {
     if (!likedList.includes(String(g.id))) return false;
+
     if (filter.category === Category.DALLAEMFIT) {
-      if (filter.type === 'ALL') {
+      if (filter.type === DallaemfitType.ALL) {
         return g.type === 'OFFICE_STRETCHING' || g.type === 'MINDFULNESS';
       } else {
         return g.type === filter.type;
@@ -104,29 +102,15 @@ export default function LikedMeetingsPage() {
 
         <div className="w-full flex flex-col justify-start py-5">
           <div className="flex flex-row">
-            <button
-              onClick={() => handleCategoryChange(Category.DALLAEMFIT)}
-              className={`text-gray-900 text-lg font-semibold px-4 py-1 ${filter.category === 'DALLAEMFIT' ? 'border-b-2 border-gray-900' : ''}`}
-            >
-              주제1
-            </button>
-            <button
-              onClick={() => handleCategoryChange(Category.WORKATION)}
-              className={`text-gray-900 text-lg font-semibold px-4 py-1 ${filter.category === 'WORKATION' ? 'border-b-2 border-gray-900' : ''}`}
-            >
-              주제2
-            </button>
+            <button onClick={() => handleCategoryChange(Category.DALLAEMFIT)} className={`text-gray-900 text-lg font-semibold px-4 py-1 ${filter.category === 'DALLAEMFIT' ? 'border-b-2 border-gray-900' : ''}`}>주제1</button>
+            <button onClick={() => handleCategoryChange(Category.WORKATION)} className={`text-gray-900 text-lg font-semibold px-4 py-1 ${filter.category === 'WORKATION' ? 'border-b-2 border-gray-900' : ''}`}>주제2</button>
           </div>
 
-          {filter.category === 'DALLAEMFIT' && (
+          {filter.category === Category.DALLAEMFIT && (
             <div className="w-full flex flex-col justify-start py-5 border-b-2 border-gray-200">
               <div className="flex flex-row items-center gap-2">
                 {Object.values(DallaemfitType).map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => handleTypeChange(type)}
-                    className={`${filter.type === type ? "bg-gray-800 text-white" : "bg-gray-200 text-gray-900"} text-sm font-medium px-4 py-2 rounded-lg`}
-                  >
+                  <button key={type} onClick={() => handleTypeChange(type)} className={`${filter.type === type ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-900'} text-sm font-medium px-4 py-2 rounded-lg`}>
                     {DALLAEMFIT_LABEL[type]}
                   </button>
                 ))}
@@ -136,9 +120,10 @@ export default function LikedMeetingsPage() {
         </div>
       </div>
 
-      <GatheringsList 
-        gatherings={visibleGatherings} 
-        fetchFromApi={false}
+      <GatheringsList
+        gatherings={visibleGatherings}
+        savedGatheringIds={likedList}
+        onToggleSaved={toggleSaved}
       />
 
       {visibleGatherings.length < filteredGatherings.length && (

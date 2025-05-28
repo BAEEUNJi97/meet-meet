@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react";
-import CreateMeetingModal from "@/components/gatherings/CreateMeetingModal";
+import { useEffect, useState } from "react";
+import { Gathering } from "@/types/gatherings";
+import { useGatheringsStore } from '@/store/gatheringsStore';
+import CreateMeetingModal from "@/components/gatherings/CreateGatheringDialog";
 import GatheringsList from "@/components/gatherings/GatheringsList";
 import Image from "next/image";
-import { Gathering } from "@/types/gatherings";
 
 interface PageProps {
     initialGatherings?: Gathering[];
@@ -12,6 +13,11 @@ interface PageProps {
 
 export default function Gatherings({ initialGatherings = [] }: PageProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const setGatherings = useGatheringsStore((s) => s.setGatherings);
+
+    useEffect(() => {
+        setGatherings(initialGatherings);
+    }, [initialGatherings, setGatherings]);
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
@@ -74,7 +80,6 @@ export default function Gatherings({ initialGatherings = [] }: PageProps) {
                 </div>
                 {/* SSR 데이터를 GatheringsList에 전달 */}
                 <GatheringsList
-                    gatherings={initialGatherings}
                     fetchFromApi={true}
                 />
             </div>

@@ -251,7 +251,6 @@ export default function ReviewPage() {
   </div>
 </section>
 
-
       {/* 🔻 리뷰 리스트 */}
       <div className="flex flex-col gap-4">
         <h3 className="text-lg font-semibold text-gray-900">📝 모든 리뷰</h3>
@@ -274,7 +273,7 @@ export default function ReviewPage() {
                   <HeartRating score={review.score} />
                   <p className="text-sm text-gray-700 mt-2">{review.comment}</p>
                   <p className="text-xs text-gray-400 mt-1">
-                    <Image src='/images/default_profile_image.svg' alt='프로필 이미지' width={32} height={32} className='rounded-full' />
+                    {/* <Image src='/images/default_profile_image.svg' alt='프로필 이미지' width={32} height={32} className='rounded-full' /> */}
                      {review.Gathering.name} · {review.Gathering.location}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">

@@ -2,10 +2,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useState, useContext } from "react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import Image from "next/image";
 import { AuthContext } from "@/providers/AuthProvider";
+import ReviewModal from "./ReviewModal";
 
 interface Gathering {
   id: string;
@@ -22,14 +23,22 @@ interface Gathering {
 
 export default function MyReviewList() {
   const [reviews, setReviews] = useState(0);
-  const { token } = useContext(AuthContext);
+ 
+  const teamId = process.env.TEAM_ID_DEV!;
+  const { token, userId } = useContext(AuthContext);
   const router = useRouter();
-
+  const [selectedReviewData, setSelectedReviewData] = useState<{
+    teamId: string;
+    userId: number;
+    gatheringId: number;
+  } | null>(null);
 
   const fetchGatherings = (token: string): Promise<Gathering[]> => {
-    return axios.get("/api/gatherings/joined", {
-      headers: { Authorization: `Bearer ${token}` },
-    }).then(res => res.data);
+    return axios
+      .get("/api/gatherings/joined", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => res.data);
   };
 
   const {
@@ -39,7 +48,7 @@ export default function MyReviewList() {
   } = useQuery<Gathering[], Error>({
     queryKey: ["myReviewGatherings", token],
     queryFn: () => fetchGatherings(token!),
-    enabled: !!token,
+    enabled: !!token && !!userId,
   });
 
   const reviewedGatherings = gatherings.filter((g) => g.isReviewed);
@@ -91,35 +100,61 @@ export default function MyReviewList() {
           </h1>
         </div>
       ) : (
-        // 리뷰 목록
         <div className="flex flex-col gap-4">
           {list.map((g) => (
-            <button
+            <div
               key={g.id}
-              className="w-full min-h-[100px] flex flex-col text-left p-4 border-2 border-blue-500 rounded-lg cursor-pointer hover:opacity-60"
-              onClick={() => router.push(`/gatherings/detail/${g.id}`)}
+              className="w-full min-h-[100px] flex flex-col text-left p-4 border-2 border-blue-500 rounded-lg hover:opacity-90 transition"
             >
-              <h1 className="text-lg font-semibold">{g.name}</h1>
-              <Image
-                src={g.image}
-                alt="모임 이미지"
-                className="rounded-lg"
-                width={100}
-                height={100}
-              />
-              <p className="text-gray-600">위치: {g.location}</p>
-              <p className="text-gray-600">종류: {g.type}</p>
-              <p className="text-gray-600">
-                참여자: {g.participantCount}/{g.capacity}명
-              </p>
-              {g.dateTime && (
+              <div
+                className="cursor-pointer"
+                onClick={() => router.push(`/gatherings/detail/${g.id}`)}
+              >
+                <h1 className="text-lg font-semibold">{g.name}</h1>
+                <Image
+                  src={g.image}
+                  alt="모임 이미지"
+                  className="rounded-lg my-2"
+                  width={100}
+                  height={100}
+                />
+                <p className="text-gray-600">위치: {g.location}</p>
+                <p className="text-gray-600">종류: {g.type}</p>
                 <p className="text-gray-600">
-                  날짜: {new Date(g.dateTime).toLocaleDateString()}
+                  참여자: {g.participantCount}/{g.capacity}명
                 </p>
+                {g.dateTime && (
+                  <p className="text-gray-600">
+                    날짜: {new Date(g.dateTime).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+
+              {reviews === 0 && (
+                <div className="mt-4 self-end">
+                  <button
+                    className="bg-main-500 text-white text-sm px-4 py-2 rounded-md hover:bg-main-600 transition-colors"
+                    onClick={() =>
+                      setSelectedReviewData({
+                        teamId: teamId, 
+                        userId: userId,
+                        gatheringId: Number(g.id),
+                      })
+                    }
+                  >
+                    리뷰 작성하기
+                  </button>
+                </div>
               )}
-            </button>
+            </div>
           ))}
-        </div>
+        </div>        
+      )}
+      {selectedReviewData && (
+        <ReviewModal
+          reviewData={selectedReviewData}
+          onClose={() => setSelectedReviewData(null)}
+        />
       )}
     </div>
   );
