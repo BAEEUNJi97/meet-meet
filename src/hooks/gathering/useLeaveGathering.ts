@@ -1,7 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
-export default function useLeaveGathering(token: string | null) {
+interface UseLeaveGatheringProps {
+    token: string | null;
+    onErrorCallback?: (msg: string) => void;
+}
+
+/** 모임 참여 취소 훅
+* @param token 토큰
+* @param onErrorCallback 에러 콜백 함수 (모달에 표시할 메세지를 전달 받음)
+* @returns {function} leaveGathering - 모임 참여 취소 함수
+*/
+export default function useLeaveGathering({ token, onErrorCallback }: UseLeaveGatheringProps) {
     const queryClient = useQueryClient();
 
     const leaveGathering = useMutation({
@@ -18,9 +28,9 @@ export default function useLeaveGathering(token: string | null) {
         onError: (error) => {
             if (axios.isAxiosError(error)) {
                 const serverError = error?.response?.data?.error;
-                alert(serverError?.message || '에러가 발생했습니다.');
+                onErrorCallback?.(serverError?.message || '에러가 발생했습니다.');
             } else {
-                alert(error.message);
+                onErrorCallback?.(error.message);
             }
         }
     });

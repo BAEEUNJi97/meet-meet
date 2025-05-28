@@ -7,7 +7,6 @@ export const getSavedGatherings = (): string[] => {
     return JSON.parse(localStorage.getItem('savedGatherings') || '[]');
 };
 
-
 /**
  * 사용자가 찜한 모임 ID 목록을 로컬 스토리지에 저장합니다.
  * @param {string[]} ids - 저장할 모임 ID 배열

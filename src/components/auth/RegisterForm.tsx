@@ -129,7 +129,7 @@ export default function RegisterForm() {
                             className='absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-60 transition-all duration-200 ease-in-out'
                             onClick={() => setIsPasswordCheckVisible((v) => !v)}
                         >
-                            <Image src={isPasswordCheckVisible ? "/images/visibility_on.svg" : "/images/visibility_off.svg"} alt="비밀번호 보기 숨김" width={24} height={24} />
+                            <Image src={isPasswordCheckVisible ? "/icons/visibility_on.svg" : "/icons/visibility_off.svg"} alt="비밀번호 보기 숨김" width={24} height={24} />
                         </button>
                     </div>
                     {!isPasswordMatch || !passwordCheck ? (

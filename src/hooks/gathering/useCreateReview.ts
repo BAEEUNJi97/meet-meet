@@ -6,27 +6,25 @@ interface UseJoinGatheringProps {
     onErrorCallback?: (msg: string) => void;
 }
 
-/** 모임 참가 훅
+/** 리뷰 생성 훅
 * @param token 토큰
 * @param onErrorCallback 에러 콜백 함수 (모달에 표시할 메세지를 전달 받음)
 * @returns {function} joinGathering - 모임 참가 함수
 */
-export default function useJoinGathering({ token, onErrorCallback }: UseJoinGatheringProps) {
+export default function useCreateReview({ token, onErrorCallback }: UseJoinGatheringProps) {
     const queryClient = useQueryClient();
 
     const joinGathering = useMutation({
-        mutationFn: async (id: number) => {
+        mutationFn: async () => {
             if (!token) throw new Error('로그인이 필요합니다.');
-            const response = await axios.post(`/api/gatherings/join?id=${id}`, {}, {
+            const response = await axios.post(`/api/reviews`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             return response.data;
         },
-        onSuccess: (_, id) => {
-            queryClient.invalidateQueries({ queryKey: ['gatheringDetail', id] });
-            queryClient.invalidateQueries({ queryKey: ['gatheringCheckJoin', id] });
-            queryClient.invalidateQueries({ queryKey: ["joinedMeetings", token] });
-            alert('참여 완료했습니다.');
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["myReviewGatherings", token] });
+            alert('리뷰 작성 완료')
         },
         onError: (error) => {
             if (axios.isAxiosError(error)) {

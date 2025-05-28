@@ -1,7 +1,24 @@
 import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
 
-export default function CheckingModal({ open, onClose, text, onConfirm }: { open: boolean, onClose: () => void, text: string, onConfirm?: () => void }) {
+interface CheckingModalProps {
+    open: boolean;
+    text: string;
+    onClose: () => void;
+    onConfirm?: () => void;
+    needLogin?: boolean;
+}
+
+/**
+ * 프로젝트 공용 팝업 모달
+ * @param open 모달 열기 여부
+ * @param text 모달에 표시할 텍스트
+ * @param onClose 닫기 함수
+ * @param onConfirm 확인 함수
+ * @param needLogin 로그인 필요 여부 (로그인 페이지로 리다이렉트)
+ * @returns 모달 팝업
+ */
+export default function ConfirmDialog({ open, text, onClose, onConfirm, needLogin }: CheckingModalProps) {
     const router = useRouter();
 
     if (!open) return null;
@@ -9,7 +26,7 @@ export default function CheckingModal({ open, onClose, text, onConfirm }: { open
     const handleConfirm = () => {
         onClose();
         if (onConfirm) onConfirm();
-        else router.push('/login');
+        else if (needLogin) router.push('/login');
     };
 
     return (

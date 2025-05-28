@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { createContext, useState, Dispatch, SetStateAction, useEffect } from "react";
 import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import CheckLoginModal from '@/components/shared/ui/CheckingModal';
+import ConfirmDialog from '@/components/shared/ui/ConfirmDialog';
 
 type AuthContextType = {
     token: string | null;
@@ -131,7 +131,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     return (
         <AuthContext value={{ token, userName, userId, loginModalOpen, setLoginModalOpen, setToken, signup, signin, signout }}>
             {children}
-            <CheckLoginModal
+            <ConfirmDialog
                 open={loginModalOpen}
                 onClose={handleLoginModalConfirm}
                 text="로그인이 필요합니다."

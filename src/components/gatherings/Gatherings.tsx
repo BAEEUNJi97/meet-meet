@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Gathering } from "@/types/gatherings";
-import CreateMeetingModal from "@/components/gatherings/CreateMeetingModal";
+import CreateMeetingModal from "@/components/gatherings/CreateGatheringDialog";
 import GatheringsList from "@/components/gatherings/GatheringsList";
 import Image from "next/image";
 

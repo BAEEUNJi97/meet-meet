@@ -1,7 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
-export default function useCancelGathering(token: string | null) {
+interface UseCancelGatheringProps {
+    token: string | null;
+    onErrorCallback?: (msg: string) => void;
+}
+
+/** 모임 삭제 훅
+* @param token 토큰
+* @param onErrorCallback 에러 콜백 함수 (모달에 표시할 메세지를 전달 받음)
+* @returns {function} cancelGathering - 모임 삭제 함수
+*/
+export default function useCancelGathering({ token, onErrorCallback }: UseCancelGatheringProps) {
     const queryClient = useQueryClient();
 
     const cancelGathering = useMutation({
@@ -17,9 +27,9 @@ export default function useCancelGathering(token: string | null) {
         onError: (error) => {
             if (axios.isAxiosError(error)) {
                 const serverError = error?.response?.data?.error;
-                alert(serverError?.message || '에러가 발생했습니다.');
+                onErrorCallback?.(serverError?.message || '에러가 발생했습니다.');
             } else {
-                alert(error.message);
+                onErrorCallback?.(error.message);
             }
         }
     });
