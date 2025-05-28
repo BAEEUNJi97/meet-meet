@@ -15,7 +15,7 @@ export default function useMakeGathering(token: string | null) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['gatherings', 'infinite'] }); // 모임 목록 새로 캐시 및 리렌더
-            queryClient.invalidateQueries({ queryKey: ["joinedMeetings", queries, token] }); // 마이페이지 '나의 모임' 새로 캐시 및 리렌더
+            queryClient.invalidateQueries({ queryKey: ["joinedGatherings", queries, token] }); // 마이페이지 '나의 모임' 새로 캐시 및 리렌더
         },
         onError: (error) => {
             if (axios.isAxiosError(error)) {
