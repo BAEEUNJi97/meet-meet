@@ -1,7 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
-export default function useJoinGathering(token: string | null) {
+interface UseJoinGatheringProps {
+    token: string | null;
+    onErrorCallback?: (msg: string) => void;
+}
+
+/** 모임 참가 훅
+* @param token 토큰
+* @param onErrorCallback 에러 콜백 함수 (모달에 표시할 메세지를 전달 받음)
+* @returns {function} joinGathering - 모임 참가 함수
+*/
+export const useJoinGathering = ({ token, onErrorCallback }: UseJoinGatheringProps) => {
     const queryClient = useQueryClient();
 
     const joinGathering = useMutation({
@@ -15,14 +25,15 @@ export default function useJoinGathering(token: string | null) {
         onSuccess: (_, id) => {
             queryClient.invalidateQueries({ queryKey: ['gatheringDetail', id] });
             queryClient.invalidateQueries({ queryKey: ['gatheringCheckJoin', id] });
+            queryClient.invalidateQueries({ queryKey: ["joinedMeetings", token] });
             alert('참여 완료했습니다.');
         },
         onError: (error) => {
             if (axios.isAxiosError(error)) {
                 const serverError = error?.response?.data?.error;
-                alert(serverError?.message || '에러가 발생했습니다.');
+                onErrorCallback?.(serverError?.message || '에러가 발생했습니다.');
             } else {
-                alert(error.message);
+                onErrorCallback?.(error.message);
             }
         }
     });

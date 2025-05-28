@@ -48,7 +48,7 @@ export default function Navbar() {
                     {token && (
                         <DropdownMenu>
                             <DropdownMenuTrigger>
-                                <Image src='/images/default_profile_image.svg' alt='profile image' width={32} height={32} className='rounded-full cursor-pointer' />
+                                <Image src='/icons/default_profile_image.svg' alt='profile image' width={32} height={32} className='rounded-full cursor-pointer' />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className='w-[9rem] mt-2 p-2 border-2 border-gray-300 rounded-md bg-white flex flex-col gap-2'>
                                 <DropdownMenuLabel className='text-main-500'>{userName}</DropdownMenuLabel>

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getSavedGatherings, setSavedGatherings } from "@/lib/api/gatherings";
+import { getSavedGatherings, setSavedGatherings } from "@/components/gatherings/shared/utils/savedGatherings";
 
 /**
  * 찜한 모임 목록을 관리하는 훅
@@ -8,7 +8,7 @@ import { getSavedGatherings, setSavedGatherings } from "@/lib/api/gatherings";
  * @returns {function} toggleSaved - 찜한 모임 토글 기능
  * @returns {boolean} isToggling - 찜한 모임 토글 기능 진행 중 여부
  */
-export const useSavedGatherings = () => {
+export const useToggleSavedGatherings = () => {
     const queryClient = useQueryClient();
 
     // 찜목록 조회
@@ -25,7 +25,7 @@ export const useSavedGatherings = () => {
             const newSaved = currentSaved.includes(gatheringId)
                 ? currentSaved.filter(id => id !== gatheringId)
                 : currentSaved.concat(gatheringId);
-            
+
             setSavedGatherings(newSaved);
             return Promise.resolve(newSaved);
         },

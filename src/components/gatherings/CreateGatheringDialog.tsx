@@ -1,14 +1,14 @@
 "use client"
 
+import { AuthContext } from '@/providers/AuthProvider';
+import { useState, useRef, useEffect, useContext } from "react";
 import { XIcon } from "lucide-react";
 import SelectionService from "./SelectionService";
-import { useState, useRef, useEffect, useContext } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { AuthContext } from '@/providers/AuthProvider';
 import useMakeGathering from '@/hooks/gathering/useMakeGathering';
 
-export default function CreateMeetingModal({ onClose }: { onClose: () => void }) {
+export default function CreateGatheringDialog({ onClose }: { onClose: () => void }) {
     const { token } = useContext(AuthContext);
     const { makeGathering } = useMakeGathering(token); // isLoading 제거
 
@@ -22,20 +22,25 @@ export default function CreateMeetingModal({ onClose }: { onClose: () => void })
 
     // 파일명 상태
     const [fileName, setFileName] = useState("");
+
     // 이미지 파일
     const [imageFile, setImageFile] = useState<File | null>(null);
+
     // 파일 입력 요소에 접근하기 위한 ref
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // 모임 날짜
     const [meetingDate, setMeetingDate] = useState<Date | null>(null);
+
     // 마감 날짜
     const [deadlineDate, setDeadlineDate] = useState<Date | null>(null);
 
     // 에러 상태 관리
     const [error, setError] = useState<string | null>(null);
+
     // 제출 상태 관리 (기존 방식 유지)
     const [isSubmitting, setIsSubmitting] = useState(false);
+
 
     // 입력 필드 변경 핸들러
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -154,6 +159,7 @@ export default function CreateMeetingModal({ onClose }: { onClose: () => void })
         // 모임 생성 요청
         makeGathering(apiFormData, {
             onSuccess: () => {
+                alert('모임 생성 완료');
                 setIsSubmitting(false);
                 onClose();
             },

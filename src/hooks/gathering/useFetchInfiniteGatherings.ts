@@ -3,12 +3,10 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { fetchGatheringsPaginated } from '@/components/gatherings/shared/utils/fetch';
 import { AuthContext } from '@/providers/AuthProvider';
 
-
-interface UseInfiniteGatheringsProps {
+interface UseFetchInfiniteGatheringsProps {
     enabled: boolean; // 무한스크롤 활성화 여부
     hasSSRData: boolean; // SSR 데이터 존재 여부
 }
-
 
 /**
  * 무한스크롤 훅
@@ -16,7 +14,7 @@ interface UseInfiniteGatheringsProps {
  * @param hasSSRData SSR 데이터 존재 여부
  * @returns 
  */
-export const useInfiniteGatherings = ({ enabled, hasSSRData }: UseInfiniteGatheringsProps) => {
+export const useFetchInfiniteGatherings = ({ enabled, hasSSRData }: UseFetchInfiniteGatheringsProps) => {
     const { token } = useContext(AuthContext);
     const observerRef = useRef<IntersectionObserver | null>(null);
     const [infiniteScrollEnabled, setInfiniteScrollEnabled] = useState(false);
@@ -49,7 +47,7 @@ export const useInfiniteGatherings = ({ enabled, hasSSRData }: UseInfiniteGather
     // Intersection Observer를 사용한 무한스크롤 트리거
     const lastItemRef = useCallback((node: HTMLDivElement | null) => {
         if (!enabled || !hasSSRData) return;
-        
+
         if (observerRef.current) {
             observerRef.current.disconnect();
         }
@@ -73,8 +71,8 @@ export const useInfiniteGatherings = ({ enabled, hasSSRData }: UseInfiniteGather
     }, [enabled, hasSSRData, infiniteScrollEnabled, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     // 무한스크롤로 불러온 모든 데이터 합치기
-    const infiniteGatherings = infiniteScrollEnabled && infiniteData?.pages 
-        ? infiniteData.pages.flat() 
+    const infiniteGatherings = infiniteScrollEnabled && infiniteData?.pages
+        ? infiniteData.pages.flat()
         : [];
 
     return {
