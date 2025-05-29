@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
 
 export default function ProfileCard() {
-  const [name, setName] = useState("");
-  const [company, setCompany] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState('');
+  const [company, setCompany] = useState('');
+  const [email, setEmail] = useState('');
 
   useEffect(() => {
-    const storedName = localStorage.getItem("user_name") || "";
-    const storedCompany = localStorage.getItem("user_company_name") || "";
-    const storedEmail = localStorage.getItem("user_email") || "";
+    const storedName = localStorage.getItem('user_name') || '';
+    const storedCompany = localStorage.getItem('user_company_name') || '';
+    const storedEmail = localStorage.getItem('user_email') || '';
 
     setName(storedName);
     setCompany(storedCompany);
@@ -19,42 +19,60 @@ export default function ProfileCard() {
   }, []);
 
   return (
-    <div className="rounded-lg overflow-hidden border">
+    <div className="overflow-hidden rounded-lg border">
       {/* Card Header with Orange Background */}
-      <div className="bg-main-350 p-4 relative pd-4">
-        <div className="text-gray-800 text-lg font-bold mb-1">내 프로필</div>
-        <div className="absolute right-4 top-4">
+      <div className="bg-main-350 pd-4 relative p-4">
+        <div className="mb-1 text-lg font-bold text-gray-800">내 프로필</div>
+        <div className="absolute top-4 right-4">
           <button>
-            <Image src="/icons/edit.svg" alt="프로필 수정" width={36} height={36} className="pointer-events-none"/>
+            <Image
+              src="/icons/edit.svg"
+              alt="프로필 수정"
+              width={36}
+              height={36}
+              className="pointer-events-none"
+            />
           </button>
         </div>
         {/*Background */}
-        <div className="h-2 mt-2 relative">
-          <div className="absolute bottom-0 right-20 flex items-end justify-end w-[120px] h-full">
-            <Image src="/icons/bg.svg" alt="배경" width={120} height={120} className="pointer-events-none"/>
+        <div className="relative mt-2 h-2">
+          <div className="absolute right-20 bottom-0 flex h-full w-[120px] items-end justify-end">
+            <Image
+              src="/icons/bg.svg"
+              alt="배경"
+              width={120}
+              height={120}
+              className="pointer-events-none"
+            />
           </div>
         </div>
       </div>
 
       {/* Profile Content */}
-      <div className="bg-white p-4 flex items-center h-full">
-        <div className="border-gray-100 rounded-full p-0.5 mr-4 -mt-16 z-1">
+      <div className="flex h-full items-center bg-white p-4">
+        <div className="z-1 -mt-16 mr-4 rounded-full border-gray-100 p-0.5">
           <button>
-            <Image src="/icons/profile.svg" alt="프로필" width={63} height={63} className="pointer-events-none" />
+            <Image
+              src="/icons/profile.svg"
+              alt="프로필"
+              width={63}
+              height={63}
+              className="pointer-events-none"
+            />
           </button>
         </div>
         <div>
-          <div className="text-gray-800 font-bold text-md">{name}</div>
-          <div className="text-sm text-gray-800 flex gap-2">
+          <div className="text-md font-bold text-gray-800">{name}</div>
+          <div className="flex gap-2 text-sm text-gray-800">
             <div className="font-bold">company.</div>
             <div>{company}</div>
           </div>
-          <div className="text-sm text-gray-800 flex gap-2">
+          <div className="flex gap-2 text-sm text-gray-800">
             <div className="font-bold">E-mail.</div>
             <div>{email}</div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
