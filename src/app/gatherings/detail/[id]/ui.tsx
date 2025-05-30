@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFetchGatheringDetail } from '@/hooks/api/useFetchGatheringDetail';
 import { useFetchDetailReview } from '@/hooks/api/useFetchDetailReview';
@@ -11,9 +11,8 @@ import { useLeaveGathering } from '@/hooks/api/useLeaveGathering';
 import { AuthContext } from '@/providers/AuthProvider';
 import { formatDate, formatTime, getTimeRemaining } from '@/components/shared/utils/format';
 import { Heart, Check, UserRoundCheck } from "lucide-react"
-import { ReviewItem } from '@/types/reviews';
+import { ReviewItem, Reviews } from '@/types/reviews';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { PageProps } from './page';
 import Image from 'next/image';
 import ConfirmDialog from '@/components/shared/ui/ConfirmDialog';
 import SaveToggleButton from '@/components/gatherings/shared/ui/SaveToggleButton';
@@ -41,22 +40,29 @@ const handleCopyUrl = () => {
     navigator.clipboard.writeText(currentUrl)
 };
 
-export default function GatheringsDetailPageUI({ params }: PageProps) {
-    const { id } = use(params);
+const LIMIT = 4;
+
+export default function GatheringsDetailPageUI({ id, detailReviews }: { id: string, detailReviews: Reviews }) {
     const { token, userId, loginModalOpen, setLoginModalOpen } = useContext(AuthContext);
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [errorModalOpen, setErrorModalOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(detailReviews?.currentPage ?? 1);
+    const [reviews, setReviews] = useState<ReviewItem[]>(detailReviews.data);
 
-    const limit = 4;
-    const offset = (page - 1) * limit;
+    const router = useRouter();
+
+    const offset = (page - 1) * LIMIT;
 
     const { detail, participants, isLoading: detailLoading } = useFetchGatheringDetail(Number(id));
     const { data: isParticipated, } = useCheckJoined(Number(id), token);
-    const { data: reviews, isLoading: reviewsLoading } = useFetchDetailReview(Number(id), limit, offset);
-    const totalPages = reviews?.totalPages || 1;
+    const { data: nextPageData, isLoading: reviewsLoading } = useFetchDetailReview(
+        Number(id),
+        LIMIT,
+        offset,
+        page > 1
+    );
 
     const { joinGathering } = useJoinGathering({
         token,
@@ -81,7 +87,11 @@ export default function GatheringsDetailPageUI({ params }: PageProps) {
         }
     });
 
-    const router = useRouter();
+    // 1페이지는 SSR 데이터만, 2페이지부터 useFetchDetailReview로 데이터 추가
+    useEffect(() => {
+        if (page === 1) return;
+        if (nextPageData) setReviews(detailReviews.data.concat(nextPageData.data));
+    }, [page, nextPageData, detailReviews.data]);
 
     const handleDeleteConfirm = () => {
         cancelGathering(Number(id));
@@ -222,7 +232,7 @@ export default function GatheringsDetailPageUI({ params }: PageProps) {
                     {reviewsLoading ? (
                         <DetailReviewLoading width='w-full' height='h-32' />
                     ) : (
-                        reviews?.data?.map((review: ReviewItem) => (
+                        reviews?.map((review: ReviewItem) => (
                             <div
                                 key={review?.id}
                                 className='w-full border-dotted border-b-2 border-main-300 flex flex-col gap-2'>
@@ -246,14 +256,14 @@ export default function GatheringsDetailPageUI({ params }: PageProps) {
                         ))
                     )}
                     {/* 페이지 컨버터 */}
-                    {totalPages >= 1 ? (
+                    {detailReviews?.totalPages >= 1 ? (
                         <div className="flex justify-center items-center gap-2 mt-4">
                             <button
                                 className="w-8 h-8 flex items-center justify-center text-gray-500 transition"
                                 disabled={page === 1}
                                 onClick={() => setPage(page - 1)}
                             >〈</button>
-                            {Array.from({ length: totalPages }).map((_, idx) => (
+                            {Array.from({ length: detailReviews?.totalPages }).map((_, idx) => (
                                 <button
                                     key={idx}
                                     className={`w-8 h-8 flex items-center justify-center rounded-full border ${page === idx + 1 ? 'border-main-500 bg-main-500 text-white font-bold' : 'border-gray-300 bg-white text-gray-500 hover:bg-main-100 transition'}`}
@@ -262,7 +272,7 @@ export default function GatheringsDetailPageUI({ params }: PageProps) {
                             ))}
                             <button
                                 className="w-8 h-8 flex items-center justify-center text-gray-500 transition"
-                                disabled={page === totalPages}
+                                disabled={page === detailReviews?.totalPages}
                                 onClick={() => setPage(page + 1)}
                             >〉</button>
                         </div>
