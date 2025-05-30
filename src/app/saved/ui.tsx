@@ -16,7 +16,7 @@ const ITEMS_PER_PAGE = 10;
 
 export default function LikeMeetingsPage() {
   const { savedIds: likedList } = useToggleSavedGatherings();
-  const allGatherings = useGatheringsStore((s) => s.gatherings); // ✅ 상태에서 전체 모임 받아오기
+  const allGatherings = useGatheringsStore((s) => s.gatherings); 
 
   const {
     filter,
